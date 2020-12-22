@@ -6,6 +6,13 @@ LABEL maintainer="onism68@gmail.com"
 #                                INSTALLATION
 ###############################################################################
 
+# 获取变量
+ARG socksProxy
+ARG tgToken
+
+ENV socksProxy=$socksProxy
+ENV tgToken=$tgToken
+
 # 设置固定的项目路径
 ENV WORKDIR /telegram-bot
 
