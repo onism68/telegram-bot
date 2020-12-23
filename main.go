@@ -1,38 +1,26 @@
 package main
 
 import (
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/os/glog"
-	//_ "telegram-bot/boot"
+	_ "telegram-bot/boot"
 	"telegram-bot/library/telegram"
-	//_ "telegram-bot/router"
+	_ "telegram-bot/library/telegram/modules/logging"
+	_ "telegram-bot/library/telegram/modules/repeater"
+	_ "telegram-bot/router"
 )
 
 func main() {
-	bot, err := telegram.Bot()
+	bot, err := telegram.BotInit()
 	if err != nil {
 		panic(err)
 	}
-	glog.Info(bot.Self.UserName)
+	glog.Infof("bot [%s] 已登录", bot.Self.UserName)
+	//ch := make(chan os.Signal, 1)
+	//signal.Notify(ch, os.Interrupt, os.Kill)
+	//<-ch
+	//bot.Stop()
+	//<-telegram.Running
+	g.Server().Run()
 
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 10
-
-	updatesChan := bot.GetUpdatesChan(u)
-
-	for update := range updatesChan {
-		if update.Message == nil {
-			continue
-		}
-		glog.Infof("ChatId[%d] %s", update.Message.Chat.ID, update.Message.Text)
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-		msg.ReplyToMessageID = update.Message.MessageID
-		send, err := bot.Send(msg)
-		if err != nil {
-			glog.Error(err)
-		}
-		glog.Info(send.Text)
-	}
-
-	//g.Server().Run()
 }
