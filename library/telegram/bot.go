@@ -109,3 +109,10 @@ func updateMessage(bot *Bot, updatesChan tgbotapi.UpdatesChannel) {
 		}
 	}
 }
+
+func SendMessage(msg tgbotapi.MessageConfig) {
+	glog.Infof("[send] [%d]: %s", msg.ChatID, msg.Text)
+	if _, err := Instance.Send(msg); err != nil {
+		glog.Error(err)
+	}
+}
