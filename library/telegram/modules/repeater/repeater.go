@@ -11,7 +11,6 @@ var instance *repeater
 var id = "cmd.repeater"
 
 func init() {
-	//instance := new(tgLog)
 	glog.Debugf("开始注册: %s", id)
 	telegram.RegisterModule(instance)
 }
@@ -46,7 +45,7 @@ func (*repeater) Start(bot *telegram.Bot, update tgbotapi.Update) {
 			glog.Error(err)
 		}
 	} else {
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "想干什么呢?")
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "使用方法: /repeater 复读文字")
 		if _, err := bot.Send(msg); err != nil {
 			glog.Error(err)
 		}

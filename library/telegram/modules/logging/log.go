@@ -10,7 +10,6 @@ import (
 var instance *tgLog
 
 func init() {
-	//instance := new(tgLog)
 	glog.Debug("开始注册: global.logging")
 	telegram.RegisterModule(instance)
 }

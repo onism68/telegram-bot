@@ -92,7 +92,9 @@ func updateMessage(bot *Bot, updatesChan tgbotapi.UpdatesChannel) {
 		if update.Message == nil {
 			continue
 		}
+
 		for _, moduleInfo := range Modules {
+
 			// 注册到全局的module
 			if moduleInfo.Id.Namespace() == GlobalModule {
 				moduleInfo.Instance.Start(bot, update)
@@ -100,13 +102,6 @@ func updateMessage(bot *Bot, updatesChan tgbotapi.UpdatesChannel) {
 			// 判断消息是否为command
 			if update.Message.IsCommand() {
 				switch update.Message.Command() {
-				case "help":
-					//glog.Info("help")
-					msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-					msg.Text = "help"
-					if _, err := bot.Send(msg); err != nil {
-						glog.Error(err)
-					}
 				case moduleInfo.Id.Name():
 					moduleInfo.Instance.Start(bot, update)
 				}
