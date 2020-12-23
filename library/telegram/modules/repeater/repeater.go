@@ -41,14 +41,10 @@ func (*repeater) Start(bot *telegram.Bot, update tgbotapi.Update) {
 	if len(update.Message.Text) > update.Message.Entities[0].Length+1 {
 		msgTmp := update.Message.Text[update.Message.Entities[0].Length+1:]
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, msgTmp)
-		if _, err := bot.Send(msg); err != nil {
-			glog.Error(err)
-		}
+		telegram.SendMessage(msg)
 	} else {
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "使用方法: /repeater 复读文字")
-		if _, err := bot.Send(msg); err != nil {
-			glog.Error(err)
-		}
+		telegram.SendMessage(msg)
 	}
 }
 

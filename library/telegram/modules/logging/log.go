@@ -36,7 +36,7 @@ func (*tgLog) Serve(bot *telegram.Bot) {
 }
 
 func (*tgLog) Start(bot *telegram.Bot, update tgbotapi.Update) {
-	go glog.Infof("[logging] [%s]-[%d]: %s", update.Message.Chat.UserName, update.Message.Chat.ID, update.Message.Text)
+	glog.Infof("[logging] [%s]-[%d]: %s", update.Message.Chat.UserName, update.Message.Chat.ID, update.Message.Text)
 }
 
 func (*tgLog) Stop(bot *telegram.Bot, wg *sync.WaitGroup) {

@@ -97,13 +97,13 @@ func updateMessage(bot *Bot, updatesChan tgbotapi.UpdatesChannel) {
 
 			// 注册到全局的module
 			if moduleInfo.Id.Namespace() == GlobalModule {
-				moduleInfo.Instance.Start(bot, update)
+				go moduleInfo.Instance.Start(bot, update)
 			}
 			// 判断消息是否为command
 			if update.Message.IsCommand() {
 				switch update.Message.Command() {
 				case moduleInfo.Id.Name():
-					moduleInfo.Instance.Start(bot, update)
+					go moduleInfo.Instance.Start(bot, update)
 				}
 			}
 		}

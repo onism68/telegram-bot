@@ -40,9 +40,7 @@ func (*help) Start(bot *telegram.Bot, update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID,
 		"/help 帮助\n"+
 			"/repeater hello 复读: hello")
-	if _, err := bot.Send(msg); err != nil {
-		glog.Error(err)
-	}
+	telegram.SendMessage(msg)
 }
 
 func (*help) Stop(bot *telegram.Bot, wg *sync.WaitGroup) {
