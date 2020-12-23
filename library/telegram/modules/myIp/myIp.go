@@ -2,22 +2,25 @@ package myIp
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/gogf/gf/os/glog"
+	"io/ioutil"
 	"sync"
 	"telegram-bot/library/telegram"
 )
 
 var instance *MyIp
+var id = "cmd.myIp"
 
 func init() {
-	//instance := &MyIp{}
-	//telegram.RegisterModule(instance)
+	glog.Debugf("开始注册: %s", id)
+	telegram.RegisterModule(instance)
 }
 
 type MyIp struct{}
 
 func (myIp *MyIp) ModuleInfo() telegram.ModuleInfo {
 	return telegram.ModuleInfo{
-		Id:       "test.myIp",
+		Id:       telegram.ModuleId(id),
 		Instance: instance,
 	}
 }
@@ -42,11 +45,15 @@ func (myIp *MyIp) Serve(bot *telegram.Bot) {
 }
 
 func (myIp *MyIp) Start(bot *telegram.Bot, update tgbotapi.Update) {
-	// 此函数会新开协程进行调用
-	// ```go
-	// 		go exampleModule.Start()
-	// ```
-	//panic("implement me")
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+	resp, err := bot.Client.Get("http://api.ip.sb/ip")
+	if err != nil {
+		msg.Text = err.Error()
+	}
+	defer resp.Body.Close()
+	b, err := ioutil.ReadAll(resp.Body)
+	msg.Text = string(b)
+	telegram.SendMessage(msg)
 }
 
 func (myIp *MyIp) Stop(bot *telegram.Bot, wg *sync.WaitGroup) {

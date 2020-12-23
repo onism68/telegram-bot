@@ -7,6 +7,7 @@ import (
 	"telegram-bot/library/telegram"
 	_ "telegram-bot/library/telegram/modules/help"
 	_ "telegram-bot/library/telegram/modules/logging"
+	_ "telegram-bot/library/telegram/modules/myIp"
 	_ "telegram-bot/library/telegram/modules/repeater"
 	_ "telegram-bot/router"
 )
