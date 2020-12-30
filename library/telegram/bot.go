@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"telegram-bot/library/redisTool"
+	"telegram-bot/library/telegram/types"
 )
 
 type Message struct {
@@ -60,9 +62,13 @@ func BotInit() (*Bot, error) {
 		})
 	}
 
+	// 获取新消息
 	go updateMessage(&Bot{
 		bot, true,
 	}, updatesChan)
+
+	// 根据消息订阅发送新消息
+	go chanSendMessage()
 
 	Instance = &Bot{
 		bot, true,
@@ -115,4 +121,18 @@ func SendMessage(msg tgbotapi.MessageConfig) {
 	if _, err := Instance.Send(msg); err != nil {
 		glog.Error(err)
 	}
+}
+
+func chanSendMessage() {
+	recMsgChan := make(chan types.TgMsg, 10)
+	// 从channel中读取消息
+	go func(recMsgChan chan types.TgMsg) {
+		for chanMsg := range recMsgChan {
+			msg := tgbotapi.NewMessage(chanMsg.ChatId, chanMsg.Message)
+			SendMessage(msg)
+		}
+	}(recMsgChan)
+	// 初始化订阅
+	subscribe := redisTool.Subscribe{SubscribeChannel: "channel"}
+	subscribe.New(recMsgChan)
 }

@@ -2,12 +2,12 @@
 [server]
 	Address     = ":8199"
 	ServerRoot  = "public"
-	ServerAgent = "gf-app"
-	LogPath     = "/tmp/log/gf-app/server"
+	ServerAgent = "telegram-bot"
+	LogPath     = "/tmp/log/telegram-bot/server"
 
 # Logger.
 [logger]
-    Path        = "/tmp/log/gf-app"
+    Path        = "/tmp/log/telegram-bot"
     Level       = "all"
     Stdout      = true
 
@@ -23,6 +23,19 @@
     debug = true
     # Database logger.
     [database.logger]
-        Path   = "/tmp/log/gf-app/sql"
+        Path   = "/tmp/log/telegram-bot/sql"
         Level  = "all"
         Stdout = true
+
+[compiler]
+    name     = "main"
+    version  = "1.0.0"
+    arch     = "amd64"
+    system   = "linux"
+    output   = ""
+    path     = "./bin"
+    extra    = "-ldflags \"-s -w\""
+    # 自定义编译时内置变量
+    [compiler.VarMap]
+        author = "onism"
+        email  = "onism68@gmail.com"
