@@ -8,6 +8,7 @@ import (
 	"os"
 	"sync"
 	"telegram-bot/library/redisTool"
+	"telegram-bot/library/telegram/modules"
 	"telegram-bot/library/telegram/types"
 )
 
@@ -27,16 +28,25 @@ func BotInit() (*Bot, error) {
 	// 设置代理
 	socksProxy := os.Getenv("socksProxy")
 	tgToken := os.Getenv("tgToken")
-	socks5, err := proxy.SOCKS5("tcp", socksProxy, nil, proxy.Direct)
-	if err != nil {
-		return nil, err
-	}
-	transport := &http.Transport{}
-	transport.Dial = socks5.Dial
-	// 初始化bot
-	bot, err := tgbotapi.NewBotAPIWithClient(tgToken, &http.Client{Transport: transport})
-	if err != nil {
-		return nil, err
+	var bot *tgbotapi.BotAPI
+	if socksProxy != "" {
+		socks5, err := proxy.SOCKS5("tcp", socksProxy, nil, proxy.Direct)
+		if err != nil {
+			return nil, err
+		}
+		transport := &http.Transport{}
+		transport.Dial = socks5.Dial
+		// 初始化bot
+		bot, err = tgbotapi.NewBotAPIWithClient(tgToken, &http.Client{Transport: transport})
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		var err error
+		bot, err = tgbotapi.NewBotAPI(tgToken)
+		if err != nil {
+			return nil, err
+		}
 	}
 	bot.Debug = false
 	u := tgbotapi.NewUpdate(0)
@@ -48,15 +58,15 @@ func BotInit() (*Bot, error) {
 	// 符合，执行module中的相关操作（将bot示例也传过去？）
 
 	// module的注册好像成了摆设？
-	for _, moduleInfo := range Modules {
+	for _, moduleInfo := range modules.Modules {
 		moduleInfo.Instance.Init()
 	}
 
-	for _, moduleInfo := range Modules {
+	for _, moduleInfo := range modules.Modules {
 		moduleInfo.Instance.PostInit()
 	}
 
-	for _, moduleInfo := range Modules {
+	for _, moduleInfo := range modules.Modules {
 		moduleInfo.Instance.Serve(&Bot{
 			bot, true,
 		})
@@ -83,13 +93,13 @@ func BotInit() (*Bot, error) {
 func (*Bot) Stop() {
 	glog.Warning("stopping ...")
 	wg := sync.WaitGroup{}
-	for _, moduleInfo := range Modules {
+	for _, moduleInfo := range modules.Modules {
 		wg.Add(1)
 		moduleInfo.Instance.Stop(Instance, &wg)
 	}
 	wg.Wait()
 	glog.Info("stopped")
-	Modules = make(map[string]ModuleInfo)
+	modules.Modules = make(map[string]modules.ModuleInfo)
 }
 
 func updateMessage(bot *Bot, updatesChan tgbotapi.UpdatesChannel) {
@@ -99,10 +109,10 @@ func updateMessage(bot *Bot, updatesChan tgbotapi.UpdatesChannel) {
 			continue
 		}
 
-		for _, moduleInfo := range Modules {
+		for _, moduleInfo := range modules.Modules {
 
 			// 注册到全局的module
-			if moduleInfo.Id.Namespace() == GlobalModule {
+			if moduleInfo.Id.Namespace() == modules.GlobalModule {
 				go moduleInfo.Instance.Start(bot, update)
 			}
 			// 判断消息是否为command

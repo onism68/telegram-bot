@@ -1,10 +1,11 @@
-package telegram
+package modules
 
 import (
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"strings"
 	"sync"
+	"telegram-bot/library/telegram"
 )
 
 var (
@@ -30,14 +31,14 @@ type Module interface {
 
 	// Serve 向Bot注册服务函数
 	// 结束后调用 Start
-	Serve(bot *Bot)
+	Serve(bot *telegram.Bot)
 
 	// Start 启用Module
-	Start(bot *Bot, update tgbotapi.Update)
+	Start(bot *telegram.Bot, update tgbotapi.Update)
 
 	// Stop 应用结束时对所有 Module 进行通知
 	// 在此进行资源回收
-	Stop(bot *Bot, wg *sync.WaitGroup)
+	Stop(bot *telegram.Bot, wg *sync.WaitGroup)
 }
 
 // id
