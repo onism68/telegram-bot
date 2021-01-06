@@ -8,7 +8,6 @@ import (
 	"os"
 	"sync"
 	"telegram-bot/library/redisTool"
-	"telegram-bot/library/telegram/modules"
 	"telegram-bot/library/telegram/types"
 )
 
@@ -58,15 +57,15 @@ func BotInit() (*Bot, error) {
 	// 符合，执行module中的相关操作（将bot示例也传过去？）
 
 	// module的注册好像成了摆设？
-	for _, moduleInfo := range modules.Modules {
+	for _, moduleInfo := range Modules {
 		moduleInfo.Instance.Init()
 	}
 
-	for _, moduleInfo := range modules.Modules {
+	for _, moduleInfo := range Modules {
 		moduleInfo.Instance.PostInit()
 	}
 
-	for _, moduleInfo := range modules.Modules {
+	for _, moduleInfo := range Modules {
 		moduleInfo.Instance.Serve(&Bot{
 			bot, true,
 		})
@@ -93,13 +92,13 @@ func BotInit() (*Bot, error) {
 func (*Bot) Stop() {
 	glog.Warning("stopping ...")
 	wg := sync.WaitGroup{}
-	for _, moduleInfo := range modules.Modules {
+	for _, moduleInfo := range Modules {
 		wg.Add(1)
 		moduleInfo.Instance.Stop(Instance, &wg)
 	}
 	wg.Wait()
 	glog.Info("stopped")
-	modules.Modules = make(map[string]modules.ModuleInfo)
+	Modules = make(map[string]ModuleInfo)
 }
 
 func updateMessage(bot *Bot, updatesChan tgbotapi.UpdatesChannel) {
@@ -109,10 +108,10 @@ func updateMessage(bot *Bot, updatesChan tgbotapi.UpdatesChannel) {
 			continue
 		}
 
-		for _, moduleInfo := range modules.Modules {
+		for _, moduleInfo := range Modules {
 
 			// 注册到全局的module
-			if moduleInfo.Id.Namespace() == modules.GlobalModule {
+			if moduleInfo.Id.Namespace() == GlobalModule {
 				go moduleInfo.Instance.Start(bot, update)
 			}
 			// 判断消息是否为command
