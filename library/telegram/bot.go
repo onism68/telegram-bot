@@ -140,6 +140,7 @@ func chanSendMessage() {
 			msg := tgbotapi.NewMessage(chanMsg.ChatId, chanMsg.Message)
 			SendMessage(msg)
 		}
+		glog.Info("已退出")
 	}(recMsgChan)
 	// 初始化订阅
 	subscribe := redisTool.Subscribe{SubscribeChannel: "channel"}

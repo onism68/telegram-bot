@@ -1,6 +1,8 @@
 package redisTool
 
 import (
+	"context"
+	"github.com/go-redis/redis/v8"
 	"github.com/gogf/gf/database/gredis"
 	"github.com/gogf/gf/encoding/gjson"
 	"github.com/gogf/gf/frame/g"
@@ -12,7 +14,7 @@ type Subscribe struct {
 	SubscribeChannel string
 }
 
-func (s *Subscribe) New(msgChan chan types.TgMsg) {
+func (s *Subscribe) NewT(msgChan chan types.TgMsg) {
 
 	redis, err := gredis.NewFromStr(g.Cfg().GetString("redis.default"))
 	conn := redis.Conn()
@@ -43,4 +45,33 @@ func (s *Subscribe) New(msgChan chan types.TgMsg) {
 		//}
 		msgChan <- *tgMsg
 	}
+}
+
+func (s *Subscribe) New(msgChan chan types.TgMsg) {
+	var ctx = context.Background()
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     g.Cfg().GetString("redis.addr"),
+		Password: g.Cfg().GetString("redis.passwd"),
+		DB:       g.Cfg().GetInt("redis.db"),
+	})
+
+	pubsub := rdb.Subscribe(ctx, s.SubscribeChannel)
+
+	_, err := pubsub.Receive(ctx)
+	if err != nil {
+		glog.Errorf("pubsub.Receive(ctx) err of %s", err.Error())
+	}
+
+	for msg := range pubsub.Channel() {
+		var tgMsg *types.TgMsg
+		//glog.Info(msg)
+		err = gjson.DecodeTo(msg.Payload, &tgMsg)
+		if err != nil {
+			glog.Errorf("conn receive error of %s", err.Error())
+			return
+		}
+		glog.Debug(tgMsg)
+		msgChan <- *tgMsg
+	}
+
 }
