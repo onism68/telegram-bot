@@ -13,7 +13,7 @@ type Subscribe struct {
 
 func (s *Subscribe) New(msgChan chan types.TgMsg) {
 	conn := g.Redis("default").Conn()
-	defer conn.Close()
+	//defer conn.Close()
 	_, err := conn.Do("SUBSCRIBE", s.SubscribeChannel)
 	if err != nil {
 		glog.Errorf("redisTool do {SUBSCRIBE %s} error of %s", s.SubscribeChannel, err)
