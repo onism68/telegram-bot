@@ -1,6 +1,7 @@
 package redisTool
 
 import (
+	"github.com/gogf/gf/database/gredis"
 	"github.com/gogf/gf/encoding/gjson"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/os/glog"
@@ -12,9 +13,12 @@ type Subscribe struct {
 }
 
 func (s *Subscribe) New(msgChan chan types.TgMsg) {
-	conn := g.Redis("default").Conn()
+
+	redis, err := gredis.NewFromStr(g.Cfg().GetString("redis.default"))
+	conn := redis.Conn()
+	//conn := g.Redis().Conn()
 	//defer conn.Close()
-	_, err := conn.Do("SUBSCRIBE", s.SubscribeChannel)
+	_, err = conn.Do("SUBSCRIBE", s.SubscribeChannel)
 	if err != nil {
 		glog.Errorf("redisTool do {SUBSCRIBE %s} error of %s", s.SubscribeChannel, err)
 		return
