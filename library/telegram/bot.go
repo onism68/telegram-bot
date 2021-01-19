@@ -3,8 +3,8 @@ package telegram
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gogf/gf/os/glog"
-	"golang.org/x/net/proxy"
 	"net/http"
+	"net/url"
 	"os"
 	"sync"
 	"telegram-bot/library/redisTool"
@@ -28,13 +28,14 @@ func BotInit() (*Bot, error) {
 	socksProxy := os.Getenv("socksProxy")
 	tgToken := os.Getenv("tgToken")
 	var bot *tgbotapi.BotAPI
+	var err error
 	if socksProxy != "" {
-		socks5, err := proxy.SOCKS5("tcp", socksProxy, nil, proxy.Direct)
-		if err != nil {
-			return nil, err
+		proxy := func(_ *http.Request) (*url.URL, error) {
+			return url.Parse(socksProxy)
 		}
-		transport := &http.Transport{}
-		transport.Dial = socks5.Dial
+		transport := &http.Transport{
+			Proxy: proxy,
+		}
 		// 初始化bot
 		bot, err = tgbotapi.NewBotAPIWithClient(tgToken, &http.Client{Transport: transport})
 		if err != nil {
