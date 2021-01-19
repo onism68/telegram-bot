@@ -21,7 +21,7 @@ type Bot struct {
 	start bool
 }
 
-var Instance *Bot
+var instance *Bot
 
 func BotInit() (*Bot, error) {
 	// 设置代理
@@ -80,7 +80,7 @@ func BotInit() (*Bot, error) {
 	// 根据消息订阅发送新消息
 	go chanSendMessage()
 
-	Instance = &Bot{
+	instance = &Bot{
 		bot, true,
 	}
 
@@ -95,7 +95,7 @@ func (*Bot) Stop() {
 	wg := sync.WaitGroup{}
 	for _, moduleInfo := range Modules {
 		wg.Add(1)
-		moduleInfo.Instance.Stop(Instance, &wg)
+		moduleInfo.Instance.Stop(instance, &wg)
 	}
 	wg.Wait()
 	glog.Info("stopped")
@@ -128,7 +128,7 @@ func updateMessage(bot *Bot, updatesChan tgbotapi.UpdatesChannel) {
 
 func SendMessage(msg tgbotapi.MessageConfig) {
 	glog.Infof("[send] [%d]: %s", msg.ChatID, msg.Text)
-	if _, err := Instance.Send(msg); err != nil {
+	if _, err := instance.Send(msg); err != nil {
 		glog.Error(err)
 	}
 }
