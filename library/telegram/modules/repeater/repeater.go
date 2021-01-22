@@ -37,15 +37,12 @@ func (*repeater) Serve(bot *telegram.Bot) {
 }
 
 func (*repeater) Start(bot *telegram.Bot, update tgbotapi.Update) {
-	// 判断收到的信息大于命令长度, 避免空命令
-	if len(update.Message.Text) > update.Message.Entities[0].Length+1 {
-		msgTmp := update.Message.Text[update.Message.Entities[0].Length+1:]
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, msgTmp)
-		telegram.SendMessage(msg)
-	} else {
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "使用方法: /repeater 复读文字")
-		telegram.SendMessage(msg)
+	args := update.Message.CommandArguments()
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "使用方法: /repeater 复读文字")
+	if len(args) > 0 {
+		msg = tgbotapi.NewMessage(update.Message.Chat.ID, args)
 	}
+	telegram.SendMessage(msg)
 }
 
 func (*repeater) Stop(bot *telegram.Bot, wg *sync.WaitGroup) {
