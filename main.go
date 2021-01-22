@@ -5,10 +5,7 @@ import (
 	"github.com/gogf/gf/os/glog"
 	_ "telegram-bot/boot"
 	"telegram-bot/library/telegram"
-	_ "telegram-bot/library/telegram/modules/help"
-	_ "telegram-bot/library/telegram/modules/logging"
-	_ "telegram-bot/library/telegram/modules/myIp"
-	_ "telegram-bot/library/telegram/modules/repeater"
+	_ "telegram-bot/library/telegram/modules"
 	_ "telegram-bot/router"
 )
 
