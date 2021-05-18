@@ -115,6 +115,10 @@ func updateMessage(bot *Bot, updatesChan tgbotapi.UpdatesChannel) {
 			if moduleInfo.Id.Namespace() == GlobalModule {
 				go moduleInfo.Instance.Start(bot, update)
 			}
+			// crontab module
+			if moduleInfo.Id.Namespace() == CronModule {
+				go moduleInfo.Instance.Start(bot, update)
+			}
 			// 判断消息是否为command
 			if update.Message.IsCommand() {
 				switch update.Message.Command() {

@@ -6,4 +6,5 @@ import (
 	_ "telegram-bot/library/telegram/modules/memorandum"
 	_ "telegram-bot/library/telegram/modules/myIp"
 	_ "telegram-bot/library/telegram/modules/repeater"
+	_ "telegram-bot/library/telegram/modules/world60s"
 )

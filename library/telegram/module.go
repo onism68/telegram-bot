@@ -10,7 +10,8 @@ import (
 var (
 	Modules      = make(map[string]ModuleInfo)
 	ModulesMu    sync.RWMutex
-	GlobalModule string = "global"
+	GlobalModule = "global"
+	CronModule   = "cron"
 )
 
 type Module interface {
