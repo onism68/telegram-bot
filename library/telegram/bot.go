@@ -37,7 +37,7 @@ func BotInit() (*Bot, error) {
 			Proxy: proxy,
 		}
 		// 初始化bot
-		bot, err = tgbotapi.NewBotAPIWithClient(tgToken, &http.Client{Transport: transport})
+		bot, err = tgbotapi.NewBotAPIWithClient(tgToken, tgbotapi.APIEndpoint, &http.Client{Transport: transport})
 		if err != nil {
 			return nil, err
 		}

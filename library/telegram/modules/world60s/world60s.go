@@ -5,6 +5,7 @@ import (
 	"github.com/gogf/gf/os/gcron"
 	"github.com/gogf/gf/os/glog"
 	"io/ioutil"
+	"net/http"
 	"sync"
 	"telegram-bot/library/telegram"
 )
@@ -56,7 +57,7 @@ func (w *World60s) Stop(bot *telegram.Bot, wg *sync.WaitGroup) {
 func do(bot *telegram.Bot, update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 	url := "http://api.03c3.cn/zb/"
-	resp, err := bot.Client.Get(url)
+	resp, err := http.Get(url)
 	if err != nil {
 		msg.Text = err.Error()
 		telegram.SendMessage(msg)
@@ -68,7 +69,7 @@ func do(bot *telegram.Bot, update tgbotapi.Update) {
 		telegram.SendMessage(msg)
 	}
 	bytes := tgbotapi.FileBytes{Name: "image.jpg", Bytes: b}
-	upload := tgbotapi.NewPhotoUpload(update.Message.Chat.ID, bytes)
+	upload := tgbotapi.NewPhoto(update.Message.Chat.ID, bytes)
 	_, err = bot.Send(upload)
 	if err != nil {
 		msg.Text = err.Error()

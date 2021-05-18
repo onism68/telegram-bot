@@ -4,6 +4,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gogf/gf/os/glog"
 	"io/ioutil"
+	"net/http"
 	"sync"
 	"telegram-bot/library/telegram"
 )
@@ -46,7 +47,7 @@ func (myIp *MyIp) Serve(bot *telegram.Bot) {
 
 func (myIp *MyIp) Start(bot *telegram.Bot, update tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-	resp, err := bot.Client.Get("http://api.ip.sb/ip")
+	resp, err := http.Get("http://api.ip.sb/ip")
 	if err != nil {
 		msg.Text = err.Error()
 	}
