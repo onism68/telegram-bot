@@ -1,3 +1,1 @@
-# GoFrame Project
-
-https://goframe.org
+# telegram-bot
