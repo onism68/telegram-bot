@@ -3,6 +3,7 @@ package telegram
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gogf/gf/os/glog"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -142,8 +143,34 @@ func chanSendMessage() {
 	// 从channel中读取消息
 	go func(recMsgChan chan types.TgMsg) {
 		for chanMsg := range recMsgChan {
-			msg := tgbotapi.NewMessage(chanMsg.ChatId, chanMsg.Message)
-			SendMessage(msg)
+			msg := tgbotapi.NewMessage(chanMsg.ChatId, "")
+			if chanMsg.Type == "" || chanMsg.Type == "text" {
+				msg.Text = chanMsg.Message
+				SendMessage(msg)
+			} else if chanMsg.Type == "img" {
+				for _, item := range chanMsg.ImgList {
+					resp, err := http.Get(item)
+					if err != nil {
+						msg.Text = err.Error()
+						SendMessage(msg)
+						glog.Errorf("获取图片内容出错!", err)
+					}
+					defer resp.Body.Close()
+					b, err := ioutil.ReadAll(resp.Body)
+					if err != nil {
+						msg.Text = err.Error()
+						SendMessage(msg)
+					}
+					bytes := tgbotapi.FileBytes{Name: "image.jpg", Bytes: b}
+					upload := tgbotapi.NewPhoto(chanMsg.ChatId, bytes)
+					_, err = instance.Send(upload)
+					if err != nil {
+						msg.Text = err.Error()
+						SendMessage(msg)
+					}
+				}
+			}
+
 		}
 		glog.Info("已退出")
 	}(recMsgChan)
