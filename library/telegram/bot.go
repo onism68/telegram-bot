@@ -3,7 +3,6 @@ package telegram
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gogf/gf/os/glog"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -155,26 +154,29 @@ func chanSendMessage() {
 					SendMessage(msg)
 				}
 			} else if chanMsg.Type == "img" {
+				mediaGroup := tgbotapi.NewMediaGroup(chanMsg.ChatId, []interface{}{})
 				for _, item := range chanMsg.ImgList {
-					resp, err := http.Get(item)
-					if err != nil {
-						msg.Text = err.Error()
-						SendMessage(msg)
-						glog.Errorf("获取图片内容出错!", err)
-					}
-					defer resp.Body.Close()
-					b, err := ioutil.ReadAll(resp.Body)
-					if err != nil {
-						msg.Text = err.Error()
-						SendMessage(msg)
-					}
-					bytes := tgbotapi.FileBytes{Name: "image.jpg", Bytes: b}
-					upload := tgbotapi.NewPhoto(chanMsg.ChatId, bytes)
-					_, err = instance.Send(upload)
-					if err != nil {
-						msg.Text = err.Error()
-						SendMessage(msg)
-					}
+					//resp, err := http.Get(item)
+					//if err != nil {
+					//	msg.Text = err.Error()
+					//	SendMessage(msg)
+					//	glog.Errorf("获取图片内容出错!", err)
+					//}
+					//defer resp.Body.Close()
+					//b, err := ioutil.ReadAll(resp.Body)
+					//if err != nil {
+					//	msg.Text = err.Error()
+					//	SendMessage(msg)
+					//}
+					//bytes := tgbotapi.FileBytes{Name: "image.jpg", Bytes: b}
+					photo := tgbotapi.NewInputMediaPhoto(tgbotapi.FileURL(item))
+					mediaGroup.Media = append(mediaGroup.Media, photo)
+				}
+				_, err := instance.SendMediaGroup(mediaGroup)
+				if err != nil {
+					msg.Text = err.Error()
+					glog.Errorf("SendMediaGroup error %s", err.Error())
+					SendMessage(msg)
 				}
 			}
 
