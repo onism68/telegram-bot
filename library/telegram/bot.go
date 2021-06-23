@@ -145,8 +145,15 @@ func chanSendMessage() {
 		for chanMsg := range recMsgChan {
 			msg := tgbotapi.NewMessage(chanMsg.ChatId, "")
 			if chanMsg.Type == "" || chanMsg.Type == "text" {
-				msg.Text = chanMsg.Message
-				SendMessage(msg)
+				if len(msg.Text) >= 4000 {
+					msg.Text = chanMsg.Message[:4000]
+					SendMessage(msg)
+					msg.Text = chanMsg.Message[4000:]
+					SendMessage(msg)
+				} else {
+					msg.Text = chanMsg.Message
+					SendMessage(msg)
+				}
 			} else if chanMsg.Type == "img" {
 				for _, item := range chanMsg.ImgList {
 					resp, err := http.Get(item)
