@@ -9,6 +9,7 @@ import (
 	"sync"
 	"telegram-bot/library/redisTool"
 	"telegram-bot/library/telegram/types"
+	"time"
 )
 
 type Message struct {
@@ -156,7 +157,7 @@ func chanSendMessage() {
 			} else if chanMsg.Type == "img" {
 				var mediaGroups []tgbotapi.MediaGroupConfig
 				mediaGroup := tgbotapi.NewMediaGroup(chanMsg.ChatId, []interface{}{})
-				for _, item := range chanMsg.ImgList {
+				for index, item := range chanMsg.ImgList {
 					//resp, err := http.Get(item)
 					//if err != nil {
 					//	msg.Text = err.Error()
@@ -172,9 +173,12 @@ func chanSendMessage() {
 					//bytes := tgbotapi.FileBytes{Name: "image.jpg", Bytes: b}
 					photo := tgbotapi.NewInputMediaPhoto(tgbotapi.FileURL(item))
 					mediaGroup.Media = append(mediaGroup.Media, photo)
-					mediaGroups = append(mediaGroups, mediaGroup)
 					if len(mediaGroup.Media) >= 9 {
+						mediaGroups = append(mediaGroups, mediaGroup)
 						mediaGroup.Media = []interface{}{}
+					}
+					if len(chanMsg.ImgList) < 9 && index == len(chanMsg.ImgList)-1 {
+						mediaGroups = append(mediaGroups, mediaGroup)
 					}
 				}
 				for _, item := range mediaGroups {
@@ -184,6 +188,7 @@ func chanSendMessage() {
 						glog.Errorf("SendMediaGroup error %s", err.Error())
 						SendMessage(msg)
 					}
+					time.Sleep(500 * time.Millisecond)
 				}
 			}
 
