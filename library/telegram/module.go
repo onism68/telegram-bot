@@ -12,6 +12,7 @@ var (
 	ModulesMu    sync.RWMutex
 	GlobalModule = "global"
 	CronModule   = "cron"
+	ActiveCron   = "Active"
 )
 
 type Module interface {

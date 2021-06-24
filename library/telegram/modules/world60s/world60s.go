@@ -4,14 +4,12 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gogf/gf/os/gcron"
 	"github.com/gogf/gf/os/glog"
-	"io/ioutil"
-	"net/http"
 	"sync"
 	"telegram-bot/library/telegram"
 )
 
 var instance *World60s
-var id = "cron.world60s"
+var id = telegram.CronModule + ".world60s"
 
 func init() {
 	glog.Debugf("开始注册: %s", id)
@@ -41,7 +39,8 @@ func (w *World60s) Serve(bot *telegram.Bot) {
 
 func (w *World60s) Start(bot *telegram.Bot, update tgbotapi.Update) {
 	glog.Info("crontab world60s")
-	_, err := gcron.Add("0 0 8 * * *", func() {
+	_, err := gcron.Add("0 0 9 * * *", func() {
+		glog.Info("world60s crontab")
 		do(bot, update)
 	})
 	if err != nil {
@@ -55,24 +54,10 @@ func (w *World60s) Stop(bot *telegram.Bot, wg *sync.WaitGroup) {
 }
 
 func do(bot *telegram.Bot, update tgbotapi.Update) {
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
 	url := "http://api.03c3.cn/zb/"
-	resp, err := http.Get(url)
+	upload := tgbotapi.NewPhoto(update.Message.Chat.ID, tgbotapi.FileURL(url))
+	_, err := bot.Send(upload)
 	if err != nil {
-		msg.Text = err.Error()
-		telegram.SendMessage(msg)
-	}
-	defer resp.Body.Close()
-	b, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		msg.Text = err.Error()
-		telegram.SendMessage(msg)
-	}
-	bytes := tgbotapi.FileBytes{Name: "image.jpg", Bytes: b}
-	upload := tgbotapi.NewPhoto(update.Message.Chat.ID, bytes)
-	_, err = bot.Send(upload)
-	if err != nil {
-		msg.Text = err.Error()
-		telegram.SendMessage(msg)
+		glog.Errorf("bot.Send(upload) error %s", err.Error())
 	}
 }
