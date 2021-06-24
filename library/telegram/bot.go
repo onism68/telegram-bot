@@ -3,6 +3,7 @@ package telegram
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/gogf/gf/os/glog"
+	"github.com/gogf/gf/util/gconv"
 	"net/http"
 	"net/url"
 	"os"
@@ -145,10 +146,12 @@ func chanSendMessage() {
 		for chanMsg := range recMsgChan {
 			msg := tgbotapi.NewMessage(chanMsg.ChatId, "")
 			if chanMsg.Type == "" || chanMsg.Type == "text" {
-				if len(msg.Text) >= 4000 {
-					msg.Text = chanMsg.Message[:4000]
+				msgRunes := gconv.Runes(chanMsg.Message)
+				if len(msgRunes) >= 4096 {
+					msg.Text = string(msgRunes[:4096])
 					SendMessage(msg)
-					msg.Text = chanMsg.Message[4000:]
+					time.Sleep(100 * time.Millisecond)
+					msg.Text = string(msgRunes[4096:])
 					SendMessage(msg)
 				} else {
 					msg.Text = chanMsg.Message
