@@ -177,7 +177,7 @@ func chanSendMessage() {
 						mediaGroups = append(mediaGroups, mediaGroup)
 						mediaGroup.Media = []interface{}{}
 					}
-					if len(chanMsg.ImgList) < 9 && index == len(chanMsg.ImgList)-1 {
+					if len(mediaGroup.Media) < 9 && index == len(chanMsg.ImgList)-1 {
 						mediaGroups = append(mediaGroups, mediaGroup)
 					}
 				}
