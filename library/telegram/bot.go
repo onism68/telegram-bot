@@ -154,6 +154,7 @@ func chanSendMessage() {
 					SendMessage(msg)
 				}
 			} else if chanMsg.Type == "img" {
+				var mediaGroups []tgbotapi.MediaGroupConfig
 				mediaGroup := tgbotapi.NewMediaGroup(chanMsg.ChatId, []interface{}{})
 				for _, item := range chanMsg.ImgList {
 					//resp, err := http.Get(item)
@@ -171,12 +172,18 @@ func chanSendMessage() {
 					//bytes := tgbotapi.FileBytes{Name: "image.jpg", Bytes: b}
 					photo := tgbotapi.NewInputMediaPhoto(tgbotapi.FileURL(item))
 					mediaGroup.Media = append(mediaGroup.Media, photo)
+					mediaGroups = append(mediaGroups, mediaGroup)
+					if len(mediaGroup.Media) >= 9 {
+						mediaGroup.Media = []interface{}{}
+					}
 				}
-				_, err := instance.SendMediaGroup(mediaGroup)
-				if err != nil {
-					msg.Text = err.Error()
-					glog.Errorf("SendMediaGroup error %s", err.Error())
-					SendMessage(msg)
+				for _, item := range mediaGroups {
+					_, err := instance.SendMediaGroup(item)
+					if err != nil {
+						msg.Text = err.Error()
+						glog.Errorf("SendMediaGroup error %s", err.Error())
+						SendMessage(msg)
+					}
 				}
 			}
 
