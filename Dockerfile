@@ -32,6 +32,7 @@ ADD template $WORKDIR/template
 ###############################################################################
 #                                   START
 ###############################################################################
+
 WORKDIR $WORKDIR
 RUN go env -w GOPROXY=https://goproxy.cn,direct
 ENTRYPOINT ["go", "run", "main.go"]
